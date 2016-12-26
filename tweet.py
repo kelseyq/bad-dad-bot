@@ -118,14 +118,14 @@ def main():
         tries += 1
         tweet = random.choice(tweets)
         baddadized = baddadize(tweet['retweeted_status']['text'])
-        print('trying: ' + baddadized)
+        print('trying: ' + baddadized.encode('utf-8'))
         if baddadized not in my_latest_tweets:
             twitter.update_status(status=baddadized)
             tweeted = True
             twitter.create_friendship(screen_name=tweet['retweeted_status']['user']['screen_name'])
 
     if tweeted:
-        print('tweeted: ' + baddadized + " after " + str(tries) + " tries")
+        print('tweeted: ' + baddadized.encode('utf-8') + " after " + str(tries) + " tries")
 
 if __name__ == "__main__":
     main()
