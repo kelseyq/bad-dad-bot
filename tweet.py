@@ -3,6 +3,7 @@
 from twython import Twython
 import random
 import json
+import re
 
 APP_KEY = ''
 APP_SECRET = ''
@@ -60,6 +61,8 @@ nope_words = [
     "game",
     "developer update",
     'radio',
+    'land',
+    'property developer'
 ]
 
 def filter_tweets(results, search_term, seen_tweets):
@@ -69,7 +72,7 @@ def filter_tweets(results, search_term, seen_tweets):
                   len(result['retweeted_status']['entities']['urls']) == 0 and
                   len(result['retweeted_status']['entities']['user_mentions']) == 0 and
                   result['retweeted_status']['favorite_count'] > 1 and
-                  search_term in result['retweeted_status']['text'] and
+                  search_term in result['retweeted_status']['text'].lower() and
                   not any(nope in result['retweeted_status']['text'].lower() for nope in nope_words)]
 
 
@@ -95,12 +98,27 @@ def get_tweets_for_term(search_term, seen_tweets):
         return tweets
 
 
+def matchcase(word):
+    def replace(m):
+        prefix = m.group(1)
+        text = m.group(2)
+        suffix = m.group(3)
+        if text.isupper():
+            return prefix + word.upper() + suffix
+        elif text.islower():
+            return prefix + word.lower() + suffix
+        elif text[0].isupper():
+            return prefix + word.title() + suffix
+        else:
+            return prefix + word + suffix
+    return replace
+
 def baddadize(text):
     simplified_terms = ['tech worker', 'software engineer', 'computer programmer', 'software developer',
                         'web developer', 'web dev', 'data scientist', 'coder', 'developer', 'programmer', 'dev']
     replaced_string = text
     for term in simplified_terms:
-        replaced_string = replaced_string.replace(term, "bad dad")
+        replaced_string = re.sub(r'(\b#*)(' + term + r")([s|\'s]*\b)", matchcase('bad dad'), replaced_string, flags=re.IGNORECASE)
     return replaced_string
 
 
@@ -119,10 +137,13 @@ def main():
         tweet = random.choice(tweets)
         baddadized = baddadize(tweet['retweeted_status']['text'])
         print('trying: ' + baddadized.encode('utf-8'))
-        if baddadized not in my_latest_tweets:
+        if baddadized not in my_latest_tweets and ('bad dad' in baddadized.lower() or 'baddad' in baddadized.lower()):
+          try:
             twitter.update_status(status=baddadized)
             tweeted = True
             twitter.create_friendship(screen_name=tweet['retweeted_status']['user']['screen_name'])
+          except Exception as e:
+             print(e)
 
     if tweeted:
         print('tweeted: ' + baddadized.encode('utf-8') + " after " + str(tries) + " tries")
