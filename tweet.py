@@ -62,7 +62,9 @@ nope_words = [
     "developer update",
     'radio',
     'land',
-    'property developer'
+    'property developer',
+    "#job",
+    "#opportunity",
 ]
 
 def filter_tweets(results, search_term, seen_tweets):
@@ -100,17 +102,16 @@ def get_tweets_for_term(search_term, seen_tweets):
 
 def matchcase(word):
     def replace(m):
-        prefix = m.group(1)
-        text = m.group(2)
-        suffix = m.group(3)
+        text = m.group()
+        suffix = m.group(1)
         if text.isupper():
-            return prefix + word.upper() + suffix
+            return word.upper() + suffix
         elif text.islower():
-            return prefix + word.lower() + suffix
+            return word.lower() + suffix
         elif text[0].isupper():
-            return prefix + word.title() + suffix
+            return word.title() + suffix
         else:
-            return prefix + word + suffix
+            return word + suffix
     return replace
 
 def baddadize(text):
@@ -118,7 +119,9 @@ def baddadize(text):
                         'web developer', 'web dev', 'data scientist', 'coder', 'developer', 'programmer', 'dev']
     replaced_string = text
     for term in simplified_terms:
-        replaced_string = re.sub(r'(\b#*)(' + term + r")([s|\'s]*\b)", matchcase('bad dad'), replaced_string, flags=re.IGNORECASE)
+        replaced_string = re.sub(r'#' + term.replace(" ", "") + r"(s*\b)", "#baddad\1", replaced_string, flags=re.IGNORECASE)
+    for term in simplified_terms:
+        replaced_string = re.sub(r'\b' + term + r"([s|\'s]*\b)", matchcase('baddad'), replaced_string, flags=re.IGNORECASE)
     return replaced_string
 
 
