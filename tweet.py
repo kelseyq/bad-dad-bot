@@ -121,7 +121,7 @@ def baddadize(text):
     for term in simplified_terms:
         replaced_string = re.sub(r'#' + term.replace(" ", "") + r"(s*\b)", "#baddad\1", replaced_string, flags=re.IGNORECASE)
     for term in simplified_terms:
-        replaced_string = re.sub(r'\b' + term + r"([s|\'s]*\b)", matchcase('baddad'), replaced_string, flags=re.IGNORECASE)
+        replaced_string = re.sub(r'\b' + term + r"([s|\'s]*\b)", matchcase('bad dad'), replaced_string, flags=re.IGNORECASE)
     return replaced_string
 
 
